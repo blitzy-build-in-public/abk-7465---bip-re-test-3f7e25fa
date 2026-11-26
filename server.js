@@ -14,6 +14,7 @@ const HELLO_PATH = '/hello';
 const HELLO_BODY = 'Hello world';
 const NOT_FOUND_BODY = 'Not Found';
 const TEXT_CONTENT_TYPE = 'text/plain';
+const CONTROL_CHARACTERS = /[\u0000-\u001f\u007f]/g;
 const openSockets = new Set();
 
 // Turn the raw PORT value into a usable port number, or fail with one actionable message.
@@ -46,9 +47,14 @@ function parsePath(requestUrl) {
   }
 }
 
-// Write the request log line, in the fixed timestamp method pathname format.
+// Write one request log line: ISO-8601 timestamp, method and pathname.
 function logRequest(method, pathname) {
-  console.log(`${new Date().toISOString()} ${method} ${pathname}`);
+  const escapedRequest = `${method} ${pathname}`.replace(
+    CONTROL_CHARACTERS,
+    (character) => `\\x${character.charCodeAt(0).toString(16).padStart(2, '0')}`
+  );
+
+  console.log(`${new Date().toISOString()} ${escapedRequest}`);
 }
 
 // Write status, headers and body exactly once, then end the response.
