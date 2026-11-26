@@ -106,15 +106,18 @@ function attachListenErrorHandler(server, port) {
   server.on('error', (error) => {
     if (error.code === 'EADDRINUSE') {
       console.error(
-        `Cannot bind to port ${port}: address already in use (EADDRINUSE). Set PORT to a free port and start again.`
+        `Cannot bind to port ${port}: address already in use (EADDRINUSE). ` +
+          'Set PORT to a free port and start again.'
       );
     } else if (error.code === 'EACCES') {
       console.error(
-        `Cannot bind to port ${port}: permission denied (EACCES). Ports below 1024 require elevated privileges.`
+        `Cannot bind to port ${port}: permission denied (EACCES). ` +
+          'Ports below 1024 require elevated privileges.'
       );
     } else {
       console.error(
-        `Cannot bind to port ${port}: ${error.code}. The port could not be bound; set PORT to a free port and start again.`
+        `Cannot bind to port ${port}: ${error.code}. ` +
+          'The port could not be bound; set PORT to a free port and start again.'
       );
     }
 

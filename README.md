@@ -68,7 +68,7 @@ curl -s -o /dev/null -w '%{http_code}\n' http://localhost:3000/hello
 200
 ```
 
-Leave this terminal running and open a second one for the next section; section 8 stops the server.
+Leave this terminal running and open a second one for sections 5 and 6; section 7 has you stop this server before its first case needs `3000` free, and section 8 documents that stop and the status it leaves.
 
 ## 5. Testing by hand
 
@@ -135,7 +135,7 @@ Not Found
 
 Matching is on method and path together, so `POST /hello` is a 404 with no `Allow` header, even though the path exists. `GET /hello/` is a 404 as well, because the trailing slash makes it a different path, and so is every unknown path. A `HEAD` request gets the 404 status and the headers above with no body, because Node suppresses the body of a `HEAD` response. The `Date`, `Connection` and `Keep-Alive` headers are added by Node and vary with the client's connection mode; the status line, `Content-Type` and `Content-Length` are the ones the server itself sets.
 
-Two timing checks follow, run in the second terminal while the server is up. The first sends 20 requests it discards so the runtime warms up, then measures 200 full client round trips and reports the 95th percentile and the slowest of them:
+Two timing checks follow, run in the second terminal while the server is up. The first sends 20 requests it discards so the runtime warms up, then measures 200 full client round trips and reports a figure just above the 95th percentile and the slowest of them:
 
 ```bash
 node -e "const http=require('http');const t=[];let i=0;const WARM=20,TOTAL=220;(function next(){if(i===TOTAL){const m=t.slice(WARM).sort((a,b)=>a-b);console.log('p95_ms='+(m[Math.floor(m.length*0.95)]/1e6).toFixed(3)+' max_ms='+(m[m.length-1]/1e6).toFixed(3));return}const s=process.hrtime.bigint();http.get('http://localhost:3000/hello',r=>{r.resume();r.on('end',()=>{t.push(Number(process.hrtime.bigint()-s));i++;next()})}).on('error',e=>{console.error(e.message);process.exitCode=1})})()"
@@ -170,9 +170,11 @@ Server listening on port 3000
 2026-11-25T23:27:34.706Z POST /hello
 ```
 
-Those three request lines are the three requests from section 5, in the order they were made. The timestamp is UTC and always carries exactly three fractional digits, so it occupies the same width on every line; yours will differ. The path is the parsed pathname only — never a query string, a header or body content — so `GET /hello?x=1` logs as `GET /hello`. The one exception is a request target Node cannot parse at all, which is logged raw so you can see what arrived. Each line is written before the response goes out, so a request whose client disconnects still appears.
+The three request lines above are the three distinct cases section 5 prints responses for, in the order they first occurred. Every request adds its own line, so this block is an excerpt rather than a full transcript: the `wc -c` check requests `/hello` a second time, and the two timing clients between them add 320 further `GET /hello` lines. The timestamp is UTC and always carries exactly three fractional digits, so it occupies the same width on every line; yours will differ. The path is the parsed pathname only — never a query string, a header or body content — so `GET /hello?x=1` logs as `GET /hello`. The one exception is a request target Node cannot parse at all, which is logged raw so you can see what arrived. Each line is written before the response goes out, so a request whose client disconnects still appears.
 
 ## 7. Configuration
+
+The server you started in section 4 is still running on `3000`. Stop it before the first case below: press `CTRL+C` in that terminal, which prints the shutdown line section 8 documents. The cases that start a server need the port they name to be free, so stop each server you start before you run the next case.
 
 One environment variable, `PORT`, chooses the port. With it unset the server uses `3000`:
 
@@ -194,7 +196,7 @@ PORT=8080 node server.js
 Server listening on port 8080
 ```
 
-Only `8080` is bound: nothing answers on `3000` during that run, because the default applies only when `PORT` is absent.
+Only `8080` is bound by that run: nothing answers on `3000` while it runs, because the default applies only when `PORT` is absent.
 
 A value outside that range, a non-integer or an empty value is refused with one message on stderr and exit status `1`:
 
@@ -209,7 +211,7 @@ Invalid PORT "abc": PORT must be an integer between 1024 and 65535.
 
 `80`, `70000`, `3000.5` and `PORT=` are rejected the same way, each message naming the value it received. A defined value is never replaced by `3000`: when it is invalid the server stops instead of binding a port you did not ask for. The `1024` floor is what refuses privileged ports — a value below it is caught by that same check before any bind is attempted, so a privileged port is never reached.
 
-If the port is already taken, the server says so and exits `1` without a stack trace. With one server already on `3000`, start a second in another terminal and check the status it leaves:
+If the port is already taken, the server says so and exits `1` without a stack trace. Start a server on `3000` again in the first terminal, exactly as the first case above does, and leave it running; then start a second one in the other terminal and check the status it leaves:
 
 ```bash
 node server.js; echo $?
