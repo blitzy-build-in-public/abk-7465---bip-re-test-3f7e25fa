@@ -8,7 +8,7 @@ This is a single-file HTTP server built on nothing but Node's built-in `http` mo
 - `package.json` — the project name and version, the `npm start` script and the Node.js `>=18.0.0` floor.
 - `README.md` — this guide.
 
-The server is meant for local use on your own machine.
+This guide is written for running the server on your own machine, and every command in it addresses `http://localhost`. The port itself is not loopback-only: `server.js` calls `server.listen(port)` with no host argument, so Node binds the unspecified address — `::` where the system has IPv6 and `0.0.0.0` otherwise — on every network interface, which means any host that can route to your machine, other machines on your local network included, reaches both routes unless your host firewall blocks the port. What that exposes is bounded: two fixed responses, with no authentication, no TLS, no security header and no rate limiting, and this tutorial adds none of them — so run it on a network you trust, or block the port at the firewall.
 
 ## 2. Prerequisites
 
