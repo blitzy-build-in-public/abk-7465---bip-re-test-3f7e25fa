@@ -24,7 +24,7 @@ v22.23.5
 
 Any version at or above `v18` works, and later releases — the current LTS lines included — run this server unchanged. The number above is the one this guide was written against, so a different one on your machine is expected.
 
-`curl`, for the requests in section 5; it ships with macOS, most Linux distributions and Windows 10 and later. Nothing else is needed.
+`curl`, for the request checks in sections 4 and 5, and a POSIX shell — `bash` or `zsh` — for the commands themselves, because `/dev/null`, the `PORT=8080 node server.js` prefix and `echo $?` come from the POSIX shell environment and do not work in `cmd.exe` or PowerShell; on Windows, run the commands in WSL or Git Bash. `curl` ships with macOS, most Linux distributions and Windows 10 and later. Nothing else is needed.
 
 ## 3. Installation
 
