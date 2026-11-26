@@ -125,7 +125,7 @@ function attachListenErrorHandler(server, port) {
   });
 }
 
-// Handle SIGINT: log, stop accepting, close tracked connections and exit with status 0.
+// Handle SIGINT: log, stop accepting, close tracked connections and exit 0 unless already set.
 function attachShutdownHandler(server) {
   process.once('SIGINT', () => {
     console.log('Received SIGINT. Shutting down server.');
@@ -138,7 +138,9 @@ function attachShutdownHandler(server) {
       socket.destroy();
     }
 
-    process.exitCode = 0;
+    if (process.exitCode === undefined) {
+      process.exitCode = 0;
+    }
   });
 }
 
